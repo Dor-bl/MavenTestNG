@@ -36,6 +36,7 @@ public class TestNG2 extends MainClass{
 		WebElement FullElement,element;
 		FullElement= driver.findElement(By.tagName("body"));
 		element= FullElement.findElement(By.id("customers"));
+		
 		String tableTxt= Functions.getTableCellText(element, searchCol, searchText, returnCol);
 		
 		System.out.print(tableTxt);
@@ -43,14 +44,22 @@ public class TestNG2 extends MainClass{
 	
 	
 	@Test
-	public void verifyTableData() {
+	public void verifyTableData() throws FileNotFoundException, IOException {
 		
 		boolean dataBool;
+		
+		List<String> params;
+		int searchCol,returnCol;
+		String searchText;
+		params= Functions.ReadDataFromCSV(searchFilePath); // Read data from CSV
+		searchCol = Integer.parseInt(params.get(0));
+		searchText = params.get(1);
+		returnCol = Integer.parseInt(params.get(2));
 		
 		WebElement FullElement,element;
 		FullElement= driver.findElement(By.tagName("body"));
 		element= FullElement.findElement(By.id("customers"));
-		dataBool =Functions.verifyTableCellText(element, 1, "Francisco Chang", 2,"Mexico");
+		dataBool =Functions.verifyTableCellText(element, searchCol, searchText, returnCol,"Mexico");
 		
 		System.out.print(dataBool);
 	}
@@ -59,10 +68,18 @@ public class TestNG2 extends MainClass{
 	@Test
 	public void GetTableDataByXpath() throws Exception {
 		
+		List<String> params;
+		int searchCol,returnCol;
+		String searchText;
+		params= Functions.ReadDataFromCSV(searchFilePath); // Read data from CSV
+		searchCol = Integer.parseInt(params.get(0));
+		searchText = params.get(1);
+		returnCol = Integer.parseInt(params.get(2));
+		
 		WebElement FullElement,element;
 		FullElement= driver.findElement(By.tagName("body"));
 		element= FullElement.findElement(By.id("customers"));
-		String tableTxt= Functions.getTableCellTextByXpath(element, 0, "Island Trading", 2);
+		String tableTxt= Functions.getTableCellTextByXpath(element, searchCol, searchText, returnCol);
 		System.out.print(tableTxt);
 	}
 	
