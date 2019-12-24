@@ -221,30 +221,12 @@ public class Functions extends MainClass{
 	
 	public static String getTableCellTextByXpath(WebElement table, int searchColumn, String searchText,int returnColumnText) throws Exception
 	{
-		WebElement cell;
-		List <WebElement> tableCells;
-		String cellData,returnTxt;
-		int i=1;
-		int dataRow=0;
-		searchColumn++; // Since XPath index start with 1, increase the value
-		returnColumnText++; // Since XPath index start with 1, increase the value
-		
-		tableCells= table.findElements(By.xpath("tbody/tr/td["+searchColumn+"]"));  //Get all cells for related column 
-		
-		for (WebElement cellElem : tableCells) {
-			cellData=cellElem.getText();
-			if (cellData.equals(searchText)){
-				dataRow= i+1; // update the row of the data in the table
-				break;	// we found the correct data
-			}
-			else
-			{
-				i++;
-			}					
-			
-		}
 					
-		cell = table.findElement(By.xpath("tbody/tr["+dataRow+"]/td["+returnColumnText+"]"));
+		WebElement cell;
+		String returnTxt;
+		
+		cell = table.findElement(By.xpath("//tr[contains(td["+searchColumn+"],'"+searchText+"')]/td["+returnColumnText+"]"));  // Get the Required Cell
+								
 		returnTxt=cell.getText();	// save the cell Text
 		
 		return returnTxt;
