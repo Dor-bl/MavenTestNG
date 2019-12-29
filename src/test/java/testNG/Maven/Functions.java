@@ -5,127 +5,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.Actions;
+import org.testng.Reporter;
 
-public class Functions extends MainClass{
+import Pages.Site777Page;
+
+public class Functions  {
 	
 	
-	public static void OpenBrowser(String browser, String Url)
-	{
-		browser= browser.toLowerCase(); // lower case the browser, in case it was passed with upper case
-		switch (browser) {
-		case "chrome":
-			System.setProperty("webdriver.chrome.driver", "E:\\Eclipse\\WebDrivers\\chromedriver.exe");		//set Chrome Driver location
-			driver = new ChromeDriver();
-			break;
-			
-		case "mozilla":
-			System.setProperty("webdriver.gecko.driver", "E:\\Eclipse\\WebDrivers\\GeckoDriver.exe");		//set FireFox Driver location
-			driver = new FirefoxDriver();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-			break;
-		}
-		
-		driver.get(Url);	//Navigate to URL
-		driver.manage().window().maximize();	//Maximize Window
-		
-	}
-	
-	public static void CloseBrowser() 
-	{
-		driver.quit();
-	}
-	
-	public static void ActivateObject(int timeout, String selector , String selectorValue, String action , String value)
-	{
-		WebElement FullElement = driver.findElement(By.tagName("body"));
-		WebElement element;
-		
-		action = action.toLowerCase();	// Set string to lowercase
-		
-		Actions actionInter = new Actions(driver);
-		element=FullElement;
-		
-		String [] selectorArr = selector.split("~");
-		String [] selectValArr = selectorValue.split("~");
-		
-			for (int i=0; i<selectorArr.length ;i++)
-			{
-			try {
-				switch (selectorArr[i]) {
-			
-				case "name":
-					element= element.findElement(By.name(selectValArr[i]));
-					break;
-				case "id":
-					element= element.findElement(By.id(selectValArr[i]));
-					break;
-				case "className":
-					element= element.findElement(By.className(selectValArr[i]));
-					break;
-				case "cssselector":
-					element =element.findElement(By.cssSelector(selectValArr[i]));
-					break;
-				case "text":
-					element = element.findElement(By.linkText(selectValArr[i]));
-					break;
-				default:
-					System.out.println("No valid selector found");					
-			
-				}
-					
-			}
-			catch(Exception ex){
-				
-				throw new ArithmeticException("Can't Find Element: "+selectValArr[i]);
-		}
-		
-		}
-		switch (action) {
-		
-		case "set":
-			element.sendKeys(value);
-			break;
-		case "click":
-			element.click();
-			break;
-		case "hover":
-			actionInter.moveToElement(element);
-			actionInter.perform();
-			break;
-		case "gettext":
-			element.getText();
-			break;
-		case "getattributeval":
-			String attVal= element.getAttribute(value);
-			WriteToFile(attVal);
-			break;
-		case "isstringequal":
-			String strVal= element.getText();
-			if (strVal != value)	//Check if strings are not equal , if different throw exception
-			{
-				System.out.println("Result as expected: " +strVal+" is equal to " + value);
-			}
-			else
-			{
-				throw new ArithmeticException( "First value: " +strVal + "should be equal to second value: "+value);
-			}
-			break;
-		
-		}
-			
-	}
-	
+
 	public static void Compare2Values(String value1 , String operator , String value2)
 	{
 		switch (operator)
@@ -140,10 +31,10 @@ public class Functions extends MainClass{
 		}
 	}
 	
-	public static void WriteToFile(String valueToSet) 
+	public static void WriteToFile(String FilePath,String valueToSet) 
 	{
 		
-		try(FileWriter writeCsv = new FileWriter(filePath)){
+		try(FileWriter writeCsv = new FileWriter(FilePath)){
 			writeCsv.append(valueToSet);
 		} catch (IOException e) {
 			System.out.println("Couldn't save Data!");
@@ -152,9 +43,9 @@ public class Functions extends MainClass{
 		
 	}
 	
-	public static void PrintStringFromFile()
+	public static void PrintStringFromFile(String file)
 	{
-		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			   String line;
 			   while ((line = br.readLine()) != null) {
 			       System.out.println(line);
@@ -181,6 +72,23 @@ public class Functions extends MainClass{
 		
 		return records;
 	}
+	
+	public static List<Integer> getIntegersFromList(List<String> strList)
+	{
+		List<Integer> intsList = new ArrayList<>();
+		Integer tempInt ;
+		for (int i = 0; i < strList.size(); i++) {
+			if (isNumeric(strList.get(i))) {
+				tempInt= Integer.parseInt(strList.get(i));
+				intsList.add(tempInt);
+			}
+				
+		}
+		
+		return intsList;
+		
+	}
+
 	
 	public static String getTableCellText(WebElement table, int searchColumn, String searchText, int returnColumnText)
 	{
@@ -219,17 +127,57 @@ public class Functions extends MainClass{
 	}
 
 	
-	public static String getTableCellTextByXpath(WebElement table, int searchColumn, String searchText,int returnColumnText) throws Exception
+	public static String GetTableCellTextByXpath(WebElement table, int searchColumn, String searchText,int returnColumnText) throws Exception
 	{
 					
 		WebElement cell;
-		String returnTxt;
-		
 		cell = table.findElement(By.xpath("//tr[contains(td["+searchColumn+"],'"+searchText+"')]/td["+returnColumnText+"]"));  // Get the Required Cell
-								
-		returnTxt=cell.getText();	// save the cell Text
+											
+		return cell.getText();	// Return the cell Text
 		
-		return returnTxt;
-		
+	}
+	
+    public static List<WebElement> getChildItemsByTagName(WebElement Element,String tagName) {
+    	List<WebElement> langArrElem;
+    	langArrElem =Element.findElements(By.tagName(tagName));  
+		return langArrElem;    	
+    }
+	
+	public static void LanguageValidation(Site777Page sitePage,String language ,WebElement langButton, String expctedStr)
+	{
+				
+		// Hover language list
+		sitePage.hoverLangBtn();
+		//Click on  language
+		sitePage.clickLang(langButton);
+		//Get Login element Text and check it equals to expected per language 
+		sitePage.assertLangValidation(expctedStr);		
+		Reporter.log(""+language+" Screen is GOOD!");
+				
+	}
+	
+    public static String[] getTextArrayFromElementsList(List<WebElement> ElementsArr, String attribute) {
+    	
+    	String[] stringArr= new String[5] ;
+    	for (WebElement elem : ElementsArr)
+    	{
+    		for (int i = 0;i < ElementsArr.size() ;i++)
+    			stringArr[i]= elem.getAttribute(attribute);
+    	}
+		return stringArr;  	
+    }
+    
+	
+	@SuppressWarnings("unused")
+	public static boolean isNumeric(String strNum) {
+	    if (strNum == null) {
+	        return false;
+	    }
+	    try {
+	        double d = Double.parseDouble(strNum);
+	    } catch (NumberFormatException nfe) {
+	        return false;
+	    }
+	    return true;
 	}
 }
