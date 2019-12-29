@@ -1,9 +1,6 @@
 package Pages;
 
-import static org.testng.Assert.assertEquals;
-
-import java.io.FileWriter;
-import java.io.IOException;
+import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -83,25 +80,14 @@ public class Site777Page extends PageObject {
     	element.click();
     }
     
-    public void assertLangText(String strVal) {
-    	assertEquals(strVal,this.getLoginBtn().getText());
+    public void assertLangValidation(String strVal) {
+    	String CurrentURL =driver.getCurrentUrl();
+    	assertTrue(CurrentURL.contains(strVal));
     }
     
     public String getColumnLangText() {
     	String attVal= this.getColumnLang().getAttribute("outerText");
     	return attVal;
-    }
-    
-	public void WriteToFile(String valueToSet) 
-	{
-		
-		try(FileWriter writeCsv = new FileWriter(filePath)){
-			writeCsv.append(valueToSet);
-		} catch (IOException e) {
-			System.out.println("Couldn't save Data!");
-			e.printStackTrace();
-		}
-            
-	}
+    }          
 	
 }
